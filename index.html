@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>მაფიის აპლიკაცია</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #0f0f12;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 450px;
+            background: #18181c;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #2a2a30;
+            text-align: center;
+        }
+
+        h1 {
+            color: #e50914;
+            font-size: 28px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        p.subtitle {
+            color: #a0a0ab;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .roles-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .role-option {
+            background: #222228;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            border: 1px solid #33333d;
+            transition: 0.2s;
+        }
+
+        .role-option:has(input:checked) {
+            border-color: #e50914;
+            background: #2a1b20;
+        }
+
+        .role-option input {
+            accent-color: #e50914;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .status-text {
+            font-size: 15px;
+            color: #d1d1d6;
+            margin-bottom: 15px;
+        }
+
+        .status-text span {
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            background: #e50914;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #f40612;
+        }
+
+        .btn-primary:disabled {
+            background: #3a3a42;
+            color: #777;
+            cursor: not-allowed;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: #fff;
+            margin-top: 15px;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .card-box {
+            background: #222228;
+            border-radius: 12px;
+            padding: 30px 20px;
+            margin: 20px 0;
+            border: 2px dashed #444450;
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .role-title-display {
+            font-size: 32px;
+            font-weight: 800;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- 1. როლების არჩევის ეკრანი -->
+    <div id="setup-screen">
+        <h1>მაფია</h1>
+        <p class="subtitle">მონიშნეთ თამაშში მონაწილე როლები</p>
+        
+        <div class="roles-grid" id="roles-list"></div>
+        
+        <div class="status-text">არჩეულია: <span id="selected-count">0</span> / 14 როლი</div>
+        <button class="btn btn-primary" id="start-btn" onclick="startGame()" disabled>თამაშის დაწყება</button>
+    </div>
+
+    <!-- 2. ბარათების გადაცემის ეკრანი -->
+    <div id="game-screen" class="hidden">
+        <h2 id="player-title" style="color: #ffffff; font-size: 22px;">მოთამაშე 1</h2>
+        
+        <div class="card-box">
+            <button class="btn btn-primary" id="reveal-btn" onclick="revealRole()">როლის ნახვა</button>
+            <div id="role-content" class="hidden">
+                <div class="role-title-display" id="role-display"></div>
+            </div>
+        </div>
+
+        <button class="btn btn-success hidden" id="next-btn" onclick="nextPlayer()">შემდეგი მოთამაშე</button>
+    </div>
+</div>
+
+<script>
+    // 14-ვე როლი მარტივი ტექსტებით
+    const rolesData = [
+        { name: "დონი", listLabel: "დონი" },
+        { name: "მაფია", listLabel: "მაფია 1" },
+        { name: "მაფია", listLabel: "მაფია 2" },
+        { name: "იაკუძა", listLabel: "იაკუძა" },
+        { name: "შოგუნი", listLabel: "შოგუნი" },
+        { name: "დეტექტივი", listLabel: "დეტექტივი" },
+        { name: "ექიმი", listLabel: "ექიმი" },
+        { name: "მანიაკი", listLabel: "მანიაკი" },
+        { name: "ბლოკერი", listLabel: "ბლოკერი" },
+        { name: "მოქალაქე", listLabel: "მოქალაქე 1" },
+        { name: "მოქალაქე", listLabel: "მოქალაქე 2" },
+        { name: "მოქალაქე", listLabel: "მოქალაქე 3" },
+        { name: "მოქალაქე", listLabel: "მოქალაქე 4" },
+        { name: "მოქალაქე", listLabel: "მოქალაქე 5" }
+    ];
+
+    let assignedRoles = [];
+    let currentIndex = 0;
+
+    // ჩექბოქსების აგება
+    const listContainer = document.getElementById('roles-list');
+    rolesData.forEach((roleObj, index) => {
+        const label = document.createElement('label');
+        label.className = 'role-option';
+        label.innerHTML = `
+            <input type="checkbox" value="${index}" onchange="updateCount()">
+            ${roleObj.listLabel}
+        `;
+        listContainer.appendChild(label);
+    });
+
+    function updateCount() {
+        const checkedBoxes = document.querySelectorAll('#roles-list input[type="checkbox"]:checked');
+        const count = checkedBoxes.length;
+        document.getElementById('selected-count').innerText = count;
+        document.getElementById('start-btn').disabled = count === 0;
+    }
+
+    function startGame() {
+        const checkedBoxes = document.querySelectorAll('#roles-list input[type="checkbox"]:checked');
+        let selectedRoles = Array.from(checkedBoxes).map(cb => rolesData[cb.value]);
+
+        // არევა (Fisher-Yates)
+        for (let i = selectedRoles.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [selectedRoles[i], selectedRoles[j]] = [selectedRoles[j], selectedRoles[i]];
+        }
+
+        assignedRoles = selectedRoles;
+        currentIndex = 0;
+
+        document.getElementById('setup-screen').classList.add('hidden');
+        document.getElementById('game-screen').classList.remove('hidden');
+        
+        showPlayerStep();
+    }
+
+    function showPlayerStep() {
+        document.getElementById('player-title').innerText = `მოთამაშე ${currentIndex + 1}`;
+        document.getElementById('role-content').classList.add('hidden');
+        document.getElementById('reveal-btn').classList.remove('hidden');
+        document.getElementById('next-btn').classList.add('hidden');
+    }
+
+    function revealRole() {
+        const currentRole = assignedRoles[currentIndex];
+        document.getElementById('role-display').innerText = currentRole.name;
+        
+        document.getElementById('role-content').classList.remove('hidden');
+        document.getElementById('reveal-btn').classList.add('hidden');
+        document.getElementById('next-btn').classList.remove('hidden');
+    }
+
+    function nextPlayer() {
+        currentIndex++;
+        if (currentIndex < assignedRoles.length) {
+            showPlayerStep();
+        } else {
+            alert('ყველა მოთამაშემ გაიგო თავისი როლი! თამაში იწყება.');
+            location.reload();
+        }
+    }
+</script>
+
+</body>
+</html>
