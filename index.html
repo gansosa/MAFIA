@@ -134,15 +134,20 @@
             padding: 30px 20px;
             margin: 20px 0;
             border: 2px dashed #444450;
-            min-height: 220px;
+            min-height: 240px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
         }
 
+        .role-icon-display {
+            font-size: 64px;
+            margin-bottom: 10px;
+        }
+
         .role-title-display {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 800;
             color: #ffd700;
             text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
@@ -174,6 +179,7 @@
         <div class="card-box">
             <button class="btn btn-primary" id="reveal-btn" onclick="revealRole()">როლის ნახვა</button>
             <div id="role-content" class="hidden">
+                <div class="role-icon-display" id="icon-display"></div>
                 <div class="role-title-display" id="role-display"></div>
             </div>
         </div>
@@ -183,22 +189,22 @@
 </div>
 
 <script>
-    // 14-ვე როლი მარტივი ტექსტებით
+    // როლები თავისი სიმბოლოებით/ხატულებით
     const rolesData = [
-        { name: "დონი", listLabel: "დონი" },
-        { name: "მაფია", listLabel: "მაფია 1" },
-        { name: "მაფია", listLabel: "მაფია 2" },
-        { name: "იაკუძა", listLabel: "იაკუძა" },
-        { name: "შოგუნი", listLabel: "შოგუნი" },
-        { name: "დეტექტივი", listLabel: "დეტექტივი" },
-        { name: "ექიმი", listLabel: "ექიმი" },
-        { name: "მანიაკი", listLabel: "მანიაკი" },
-        { name: "ბლოკერი", listLabel: "ბლოკერი" },
-        { name: "მოქალაქე", listLabel: "მოქალაქე 1" },
-        { name: "მოქალაქე", listLabel: "მოქალაქე 2" },
-        { name: "მოქალაქე", listLabel: "მოქალაქე 3" },
-        { name: "მოქალაქე", listLabel: "მოქალაქე 4" },
-        { name: "მოქალაქე", listLabel: "მოქალაქე 5" }
+        { name: "დონი", icon: "🕶️", listLabel: "🕶️ დონი" },
+        { name: "მაფია", icon: "🕶️", listLabel: "🕶️ მაფია 1" },
+        { name: "მაფია", icon: "🕶️", listLabel: "🕶️ მაფია 2" },
+        { name: "იაკუძა", icon: "⚔️", listLabel: "⚔️ იაკუძა" },
+        { name: "შოგუნი", icon: "👑", listLabel: "👑 შოგუნი" },
+        { name: "დეტექტივი", icon: "🔍", listLabel: "🔍 დეტექტივი" },
+        { name: "ექიმი", icon: "✚", listLabel: "✚ ექიმი" },
+        { name: "მანიაკი", icon: "🔪", listLabel: "🔪 მანიაკი" },
+        { name: "ბლოკერი", icon: "💻", listLabel: "💻 ბლოკერი" },
+        { name: "მოქალაქე", icon: "❤️", listLabel: "❤️ მოქალაქე 1" },
+        { name: "მოქალაქე", icon: "❤️", listLabel: "❤️ მოქალაქე 2" },
+        { name: "მოქალაქე", icon: "❤️", listLabel: "❤️ მოქალაქე 3" },
+        { name: "მოქალაქე", icon: "❤️", listLabel: "❤️ მოქალაქე 4" },
+        { name: "მოქალაქე", icon: "❤️", listLabel: "❤️ მოქალაქე 5" }
     ];
 
     let assignedRoles = [];
@@ -252,10 +258,14 @@
     function revealRole() {
         const currentRole = assignedRoles[currentIndex];
         document.getElementById('role-display').innerText = currentRole.name;
+        document.getElementById('icon-display').innerText = currentRole.icon;
         
         document.getElementById('role-content').classList.remove('hidden');
         document.getElementById('reveal-btn').classList.add('hidden');
-        document.getElementById('next-btn').classList.remove('hidden');
+        
+        setTimeout(() => {
+            document.getElementById('next-btn').classList.remove('hidden');
+        }, 300);
     }
 
     function nextPlayer() {
